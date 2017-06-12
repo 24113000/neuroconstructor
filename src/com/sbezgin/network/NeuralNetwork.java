@@ -1,5 +1,6 @@
 package com.sbezgin.network;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,10 +8,13 @@ import java.util.Map;
 public class NeuralNetwork {
     private int levelNumber;
     private Map<Integer, List<Neuron>> levels;
-
-    public NeuralNetwork(int levelNumber, Map<Integer, List<Neuron>> levels) {
+    private List<Integer> levelIds;
+    public NeuralNetwork(Map<Integer, List<Neuron>> levels) {
         this.levels = new HashMap<>(levels);
-        this.levelNumber = levelNumber;
+        this.levelNumber = levels.size();
+
+        levelIds = new ArrayList<>(levels.keySet());
+        levelIds.sort(Integer::compareTo);
     }
 
     public List<Neuron> getLevel(int levelNumber) {
@@ -19,5 +23,9 @@ public class NeuralNetwork {
 
     public int getLevelNumber() {
         return levelNumber;
+    }
+
+    public List<Integer> getLevelIds() {
+        return levelIds;
     }
 }

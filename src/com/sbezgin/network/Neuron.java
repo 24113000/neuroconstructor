@@ -5,14 +5,23 @@ import java.util.Collections;
 import java.util.List;
 
 public class Neuron {
-    private final List<Synapse> inSynapses;
-    private final List<Synapse> outSynapses;
+    private final List<Synapse> inSynapses = new ArrayList<>();
+    private final List<Synapse> outSynapses = new ArrayList<>();
     private final int levelNumber;
+    private double currentResult;
 
-    public Neuron(List<Synapse> inSynapses, List<Synapse> outSynapses, int levelNumber) {
-        this.inSynapses = new ArrayList<Synapse>(inSynapses);
-        this.outSynapses = new ArrayList<Synapse>(outSynapses);
+    public Neuron(int levelNumber) {
         this.levelNumber = levelNumber;
+    }
+
+    public void addInSynapse(Synapse s) {
+        s.setTo(this);
+        inSynapses.add(s);
+    }
+
+    public void addOutSynapse(Synapse s) {
+        s.setFrom(this);
+        outSynapses.add(s);
     }
 
     public List<Synapse> getInSynapses() {
@@ -25,5 +34,13 @@ public class Neuron {
 
     public int getLevelNumber() {
         return levelNumber;
+    }
+
+    public double getCurrentResult() {
+        return currentResult;
+    }
+
+    public void setCurrentResult(double currentResult) {
+        this.currentResult = currentResult;
     }
 }
