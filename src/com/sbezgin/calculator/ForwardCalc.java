@@ -5,6 +5,7 @@ import com.sbezgin.network.Neuron;
 import com.sbezgin.network.Synapse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ForwardCalc {
@@ -56,9 +57,11 @@ public class ForwardCalc {
     public void reset() {
         currentLevel = 0;
         isCalculationFinished = false;
+        System.out.print(Arrays.toString(inputValues.toArray()) + " -- ");
+        System.out.println("  Result = " + neuralNetwork.getLevel(2).get(0).getCurrentResult());
     }
 
     private double sigmoid(double val){
-        return 1.0 / (1.0 + Math.exp(val));
+        return 1.0 / (1.0 + Math.exp(-1*val));
     }
 }

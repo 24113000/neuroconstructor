@@ -4,12 +4,14 @@ import com.sbezgin.network.NeuralNetwork;
 import com.sbezgin.network.Neuron;
 import com.sbezgin.network.Synapse;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class BackPropogationCalc {
     private final GradientDecentCalc decentCalc;
     private final NeuralNetwork neuralNetwork;
     private NetworkArrayContainer partialDerivatives;
+    private double costResult = 0.0;
 
     public BackPropogationCalc(NeuralNetwork neuralNetwork, GradientDecentCalc decentCalc) {
         this.neuralNetwork = neuralNetwork;
@@ -17,7 +19,7 @@ public class BackPropogationCalc {
         partialDerivatives  = new NetworkArrayContainer(neuralNetwork);
     }
 
-    public void collectDeltaError(double[] expectedResult) {
+    public void collectDeltaError(double[] expectedResult, Double[] inputValues) {
         int lastLevelId = neuralNetwork.getLevelNumber() - 1;
         double[][] deltas = new double[neuralNetwork.getLevelNumber()][];
 
@@ -31,6 +33,8 @@ public class BackPropogationCalc {
                     Neuron neuron = level.get(i);
                     double currentResult = neuron.getCurrentResult();
                     deltas[levelNum][i] = currentResult - expectedResult[i];
+                    System.out.println("BACK " + Arrays.toString(inputValues) + " Expected result: " + Arrays.toString(expectedResult) + " DIFF: " + deltas[levelNum][i]);
+                    costResult += (deltas[levelNum][i] * deltas[levelNum][i]);
                 }
             } else {
                 int nextLevel = levelNum + 1;
@@ -57,13 +61,20 @@ public class BackPropogationCalc {
                 double delta = currDelta[i];
                 for (int j = 0; j < inSynapses.size(); j++) {
                     Synapse synapse = inSynapses.get(j);
-                    partialDerivatives.set(levelNum, i, j, synapse.getFrom().getCurrentResult() * delta);
+                    Neuron from = synapse.getFrom();
+                    if (from != null) {
+                        partialDerivatives.set(levelNum, i, j, from.getCurrentResult() * delta);
+                    } else {
+                        partialDerivatives.set(levelNum, i, j, inputValues[j] * delta);
+                    }
                 }
             }
         }
     }
 
-    public void updateSynapses() {
+    public double updateSynapses() {
+        double result = costResult;
+        costResult = 0.0;
         NetworkArrayContainer theta = getCurrentTheta();
         NetworkArrayContainer newThetas = decentCalc.calc(theta, partialDerivatives);
         List<Double[][]> arrays = newThetas.getArrays();
@@ -79,6 +90,8 @@ public class BackPropogationCalc {
                 }
             }
         }
+
+        return result/(2*1);
     }
 
     private NetworkArrayContainer getCurrentTheta() {

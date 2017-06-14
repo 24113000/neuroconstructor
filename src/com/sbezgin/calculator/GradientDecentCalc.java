@@ -18,7 +18,7 @@ public class GradientDecentCalc {
             Double[][] lvlTheta = thArrays.get(k);
             for (int i = 0; i < lvlTheta.length; i++) {
                 for (int j = 0; j < lvlTheta[i].length; j++) {
-                    double newVal = lvlTheta[i][j] - (rate * partialDerivatives.get(k, i, j));
+                    double newVal = lvlTheta[i][j] - (rate * (partialDerivatives.get(k, i, j))/1);
                     result.set(k, i, j, newVal);
                 }
             }

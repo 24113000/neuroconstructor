@@ -14,21 +14,50 @@ public class Main {
     public static void main(String[] args) {
         Map<Integer, List<Neuron>> map = buildMap();
         NeuralNetwork neuralNetwork = new NeuralNetwork(map);
-        ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, Arrays.asList(0.1, 0.1));
-        BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.004));
-        for (int i = 0; i < 5; i++) {
-            forwardCalc.evaluateNextLevel();
-            forwardCalc.evaluateNextLevel();
-            forwardCalc.evaluateNextLevel();
+        Map<List<Double>, Integer> trainingExample = new HashMap<>();
 
-            backPropogationCalc.collectDeltaError(new double[]{1.0});
-            backPropogationCalc.updateSynapses();
+        trainingExample.put(Arrays.asList(1.0, 1.0),1);
+/*
+        trainingExample.put(Arrays.asList(0.0, 1.0),0);
+        trainingExample.put(Arrays.asList(1.0, 0.0),0);
+        trainingExample.put(Arrays.asList(0.0, 0.0),0);
+*/
 
-            forwardCalc.reset();
+        for (int i = 0; i < 10000; i++) {
+            BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.003));
+
+            for (Map.Entry<List<Double>, Integer> entry : trainingExample.entrySet()) {
+                List<Double> inputParams = entry.getKey();
+                Integer expectedResult = entry.getValue();
+                ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, inputParams);
+
+                forwardCalc.evaluateNextLevel();
+                forwardCalc.evaluateNextLevel();
+                forwardCalc.evaluateNextLevel();
+
+                backPropogationCalc.collectDeltaError(new double[]{expectedResult}, inputParams.toArray(new Double[inputParams.size()]));
+
+                forwardCalc.reset();
+            }
+
+            System.out.println("COST == " + backPropogationCalc.updateSynapses());
         }
 
-        double currentResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
-        System.out.printf("Current result: " + currentResult);
+        ForwardCalc forwardCalcTrue= new ForwardCalc(neuralNetwork, Arrays.asList(1.0, 1.0));
+        forwardCalcTrue.evaluateNextLevel();
+        forwardCalcTrue.evaluateNextLevel();
+        forwardCalcTrue.evaluateNextLevel();
+
+        double trueResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final true result : " + trueResult);
+
+        ForwardCalc forwardCalcNotTrue= new ForwardCalc(neuralNetwork, Arrays.asList(0.0, 1.0));
+        forwardCalcNotTrue.evaluateNextLevel();
+        forwardCalcNotTrue.evaluateNextLevel();
+        forwardCalcNotTrue.evaluateNextLevel();
+
+        double notTrueResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final NOT true result : " + notTrueResult);
     }
 
     private static Map<Integer, List<Neuron>> buildMap() {

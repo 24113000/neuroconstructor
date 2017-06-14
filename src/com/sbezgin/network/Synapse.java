@@ -3,13 +3,14 @@ package com.sbezgin.network;
 import java.util.Random;
 
 public class Synapse {
+    private int epsilon = 1;
     private double weight;
     private Neuron from;
     private Neuron to;
 
     public Synapse() {
         Random random = new Random();
-        weight = random.nextDouble();
+        weight = (random.nextDouble() * 2 * epsilon) - epsilon;
     }
 
     public double getWeight() {
