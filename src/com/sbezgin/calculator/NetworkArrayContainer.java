@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class NetworkArrayContainer {
+
     private List<Double[][]> array;
 
     public NetworkArrayContainer(NetworkArrayContainer other) {
@@ -17,7 +18,7 @@ public class NetworkArrayContainer {
         for (int i = 0; i < levelNumber; i++) {
             Double[][] arrayLevel = other.array.get(i);
             int neuronNumber = arrayLevel.length;
-            array.add(new Double[neuronNumber][arrayLevel[i].length]);
+            array.add(new Double[neuronNumber][arrayLevel[0].length]);
         }
     }
 

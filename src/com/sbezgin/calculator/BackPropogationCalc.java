@@ -4,7 +4,6 @@ import com.sbezgin.network.NeuralNetwork;
 import com.sbezgin.network.Neuron;
 import com.sbezgin.network.Synapse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BackPropogationCalc {
@@ -20,21 +19,21 @@ public class BackPropogationCalc {
 
     public void collectDeltaError(double[] expectedResult) {
         int lastLevelId = neuralNetwork.getLevelNumber() - 1;
-        Double[][] deltas = new Double[neuralNetwork.getLevelNumber()][];
+        double[][] deltas = new double[neuralNetwork.getLevelNumber()][];
 
         for (int levelNum = lastLevelId; levelNum >= 0; levelNum--) {
             List<Neuron> level = neuralNetwork.getLevel(levelNum);
 
-            deltas[levelNum] = new Double[level.size()];
+            deltas[levelNum] = new double[level.size()];
 
             if (levelNum == lastLevelId) {
                 for (int i = 0; i < level.size(); i++) {
-                    Neuron neuron = level.get(0);
+                    Neuron neuron = level.get(i);
                     double currentResult = neuron.getCurrentResult();
                     deltas[levelNum][i] = currentResult - expectedResult[i];
                 }
             } else {
-                int prevLevel = ++levelNum;
+                int nextLevel = levelNum + 1;
                 for (int i=0; i < level.size(); i++) {
                     Neuron neuron = level.get(i);
                     List<Synapse> outSynapses = neuron.getOutSynapses();
@@ -42,7 +41,7 @@ public class BackPropogationCalc {
                         Synapse synapse = outSynapses.get(j);
                         double weight = synapse.getWeight();
 
-                        Double[] prevDelta = deltas[prevLevel];
+                        double[] prevDelta = deltas[nextLevel];
 
                         deltas[levelNum][i] += weight * prevDelta[j];
                     }
@@ -51,16 +50,14 @@ public class BackPropogationCalc {
                 }
             }
 
-            if (levelNum != lastLevelId) {
-                Double[] currDelta = deltas[levelNum + 1];
-                for (int i = 0; i < level.size(); i++) {
-                    Neuron neuron = level.get(i);
-                    List<Synapse> outSynapses = neuron.getOutSynapses();
-
-                    for (int j = 0; j < outSynapses.size(); j++) {
-                        double delta = currDelta[j];
-                        partialDerivatives.set(levelNum, j, i, neuron.getCurrentResult() * delta);
-                    }
+            double[] currDelta = deltas[levelNum];
+            for (int i = 0; i < level.size(); i++) {
+                Neuron neuron = level.get(i);
+                List<Synapse> inSynapses = neuron.getInSynapses();
+                double delta = currDelta[i];
+                for (int j = 0; j < inSynapses.size(); j++) {
+                    Synapse synapse = inSynapses.get(j);
+                    partialDerivatives.set(levelNum, i, j, synapse.getFrom().getCurrentResult() * delta);
                 }
             }
         }
@@ -70,7 +67,7 @@ public class BackPropogationCalc {
         NetworkArrayContainer theta = getCurrentTheta();
         NetworkArrayContainer newThetas = decentCalc.calc(theta, partialDerivatives);
         List<Double[][]> arrays = newThetas.getArrays();
-        for (int k = 0; k < arrays.size(); k++) {
+        for (int k = 1; k < arrays.size(); k++) {
             Double[][] lvlTheta = arrays.get(k);
             List<Neuron> level = neuralNetwork.getLevel(k);
             for (int i = 0; i < lvlTheta.length; i++) {
@@ -91,9 +88,9 @@ public class BackPropogationCalc {
         for (int levelNum = lastLevelId; levelNum >= 0; levelNum--) {
             List<Neuron> level = neuralNetwork.getLevel(levelNum);
             for (int i = 0; i < level.size(); i++) {
-                Neuron neuron = level.get(0);
+                Neuron neuron = level.get(i);
                 List<Synapse> inSynapses = neuron.getInSynapses();
-                for (int j = 0; i < inSynapses.size(); i++) {
+                for (int j = 0; j < inSynapses.size(); j++) {
                     Synapse synapse = inSynapses.get(j);
                     theta.set(levelNum, i, j, synapse.getWeight());
                 }

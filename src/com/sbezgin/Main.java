@@ -14,16 +14,21 @@ public class Main {
     public static void main(String[] args) {
         Map<Integer, List<Neuron>> map = buildMap();
         NeuralNetwork neuralNetwork = new NeuralNetwork(map);
-        ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, Arrays.asList(1.0, 1.0));
-        BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.04));
-        while (true) {
+        ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, Arrays.asList(0.1, 0.1));
+        BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.004));
+        for (int i = 0; i < 5; i++) {
             forwardCalc.evaluateNextLevel();
             forwardCalc.evaluateNextLevel();
             forwardCalc.evaluateNextLevel();
 
             backPropogationCalc.collectDeltaError(new double[]{1.0});
             backPropogationCalc.updateSynapses();
+
+            forwardCalc.reset();
         }
+
+        double currentResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.printf("Current result: " + currentResult);
     }
 
     private static Map<Integer, List<Neuron>> buildMap() {
@@ -71,6 +76,8 @@ public class Main {
         neuron11.addOutSynapse(s01L2);
 
         Neuron neuron20 = new Neuron(2);
+        neuron20.addInSynapse(s00L2);
+        neuron20.addInSynapse(s01L2);
 
         Map<Integer, List<Neuron>> map = new HashMap<>();
         map.put(0, Arrays.asList(neuron00, neuron01));

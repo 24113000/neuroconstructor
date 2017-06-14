@@ -19,14 +19,24 @@ public class ForwardCalc {
     }
 
     public CalcResult evaluateNextLevel() {
-        CalcResult calcResult = evaluate();
         List<Neuron> level = neuralNetwork.getLevel(currentLevel);
+        List<Double> values;
+        if (currentLevel == 0) {
+            values = inputValues;
+        } else {
+            List<Neuron> prevNeurons = neuralNetwork.getLevel(currentLevel - 1);
+            values = new ArrayList<>(prevNeurons.size());
+            for (Neuron prevNeuron : prevNeurons) {
+                values.add(prevNeuron.getCurrentResult());
+            }
+        }
+
         for (Neuron neuron : level) {
             List<Synapse> inSynapses = neuron.getInSynapses();
             double sum = 0.0;
             for (int i = 0; i < inSynapses.size(); i++) {
                 Synapse synapse = inSynapses.get(i);
-                sum += synapse.getWeight() * inputValues.get(i);
+                sum += synapse.getWeight() * values.get(i);
             }
             double neuronOut = sigmoid(sum);
             neuron.setCurrentResult(neuronOut);
@@ -36,10 +46,6 @@ public class ForwardCalc {
             isCalculationFinished = true;
         }
         currentLevel++;
-        return calcResult;
-    }
-
-    private CalcResult evaluate() {
         return null;
     }
 
