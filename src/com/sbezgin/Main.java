@@ -22,7 +22,7 @@ public class Main {
         trainingExample.put(Arrays.asList(0.0, 0.0),0);
 
 
-        for (int i = 0; i < 4000; i++) {
+        for (int i = 0; i < 9000; i++) {
             BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.3));
 
             for (Map.Entry<List<Double>, Integer> entry : trainingExample.entrySet()) {
