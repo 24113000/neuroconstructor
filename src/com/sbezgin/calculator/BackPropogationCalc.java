@@ -63,22 +63,22 @@ public class BackPropogationCalc {
                     Synapse synapse = inSynapses.get(j);
                     Neuron from = synapse.getFrom();
                     if (from != null) {
-                        partialDerivatives.set(levelNum, i, j, from.getCurrentResult() * delta);
+                        partialDerivatives.add(levelNum, i, j, from.getCurrentResult() * delta);
                     } else {
-                        partialDerivatives.set(levelNum, i, j, inputValues[j] * delta);
+                        partialDerivatives.add(levelNum, i, j, inputValues[j] * delta);
                     }
                 }
             }
         }
     }
 
-    public double updateSynapses() {
+    public double updateSynapses(int trainingNumber) {
         double result = costResult;
         costResult = 0.0;
         NetworkArrayContainer theta = getCurrentTheta();
-        NetworkArrayContainer newThetas = decentCalc.calc(theta, partialDerivatives);
+        NetworkArrayContainer newThetas = decentCalc.calc(theta, partialDerivatives, trainingNumber);
         List<Double[][]> arrays = newThetas.getArrays();
-        for (int k = 1; k < arrays.size(); k++) {
+        for (int k = 0; k < arrays.size(); k++) {
             Double[][] lvlTheta = arrays.get(k);
             List<Neuron> level = neuralNetwork.getLevel(k);
             for (int i = 0; i < lvlTheta.length; i++) {
@@ -91,7 +91,7 @@ public class BackPropogationCalc {
             }
         }
 
-        return result/(2*1);
+        return result/(2*trainingNumber);
     }
 
     private NetworkArrayContainer getCurrentTheta() {

@@ -17,14 +17,13 @@ public class Main {
         Map<List<Double>, Integer> trainingExample = new HashMap<>();
 
         trainingExample.put(Arrays.asList(1.0, 1.0),1);
-/*
         trainingExample.put(Arrays.asList(0.0, 1.0),0);
         trainingExample.put(Arrays.asList(1.0, 0.0),0);
         trainingExample.put(Arrays.asList(0.0, 0.0),0);
-*/
 
-        for (int i = 0; i < 10000; i++) {
-            BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.003));
+
+        for (int i = 0; i < 100000; i++) {
+            BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, new GradientDecentCalc(0.03));
 
             for (Map.Entry<List<Double>, Integer> entry : trainingExample.entrySet()) {
                 List<Double> inputParams = entry.getKey();
@@ -40,24 +39,40 @@ public class Main {
                 forwardCalc.reset();
             }
 
-            System.out.println("COST == " + backPropogationCalc.updateSynapses());
+            System.out.println("COST == " + backPropogationCalc.updateSynapses(trainingExample.size()));
         }
 
-        ForwardCalc forwardCalcTrue= new ForwardCalc(neuralNetwork, Arrays.asList(1.0, 1.0));
-        forwardCalcTrue.evaluateNextLevel();
-        forwardCalcTrue.evaluateNextLevel();
-        forwardCalcTrue.evaluateNextLevel();
+        ForwardCalc forwardCalcTrue11= new ForwardCalc(neuralNetwork, Arrays.asList(1.0, 1.0));
+        forwardCalcTrue11.evaluateNextLevel();
+        forwardCalcTrue11.evaluateNextLevel();
+        forwardCalcTrue11.evaluateNextLevel();
 
-        double trueResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
-        System.out.println("Final true result : " + trueResult);
+        double result = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final 1 1 result : " + result);
 
-        ForwardCalc forwardCalcNotTrue= new ForwardCalc(neuralNetwork, Arrays.asList(0.0, 1.0));
-        forwardCalcNotTrue.evaluateNextLevel();
-        forwardCalcNotTrue.evaluateNextLevel();
-        forwardCalcNotTrue.evaluateNextLevel();
+        ForwardCalc forwardCalc00= new ForwardCalc(neuralNetwork, Arrays.asList(0.0, 0.0));
+        forwardCalc00.evaluateNextLevel();
+        forwardCalc00.evaluateNextLevel();
+        forwardCalc00.evaluateNextLevel();
 
-        double notTrueResult = neuralNetwork.getLevel(2).get(0).getCurrentResult();
-        System.out.println("Final NOT true result : " + notTrueResult);
+        result = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final 0 0 result : " + result);
+
+        ForwardCalc forwardCalc01= new ForwardCalc(neuralNetwork, Arrays.asList(0.0, 1.0));
+        forwardCalc01.evaluateNextLevel();
+        forwardCalc01.evaluateNextLevel();
+        forwardCalc01.evaluateNextLevel();
+
+        result = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final 0 1 result : " + result);
+
+        ForwardCalc forwardCalc10= new ForwardCalc(neuralNetwork, Arrays.asList(1.0, 0.0));
+        forwardCalc10.evaluateNextLevel();
+        forwardCalc10.evaluateNextLevel();
+        forwardCalc10.evaluateNextLevel();
+
+        result = neuralNetwork.getLevel(2).get(0).getCurrentResult();
+        System.out.println("Final 1 0 result : " + result);
     }
 
     private static Map<Integer, List<Neuron>> buildMap() {
@@ -111,7 +126,7 @@ public class Main {
         Map<Integer, List<Neuron>> map = new HashMap<>();
         map.put(0, Arrays.asList(neuron00, neuron01));
         map.put(1, Arrays.asList(neuron10, neuron11));
-        map.put(2, Arrays.asList(neuron10));
+        map.put(2, Arrays.asList(neuron20));
         return map;
     }
 }

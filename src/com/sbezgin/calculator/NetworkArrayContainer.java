@@ -39,6 +39,9 @@ public class NetworkArrayContainer {
 
     public void add(int level, int i, int j, double value) {
         Double[][] doubles = array.get(level);
+        if (doubles[i][j] == null) {
+            doubles[i][j] = 0.0;
+        }
         doubles[i][j] += value;
     }
 

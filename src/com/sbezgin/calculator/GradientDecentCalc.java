@@ -10,7 +10,7 @@ public class GradientDecentCalc {
         this.rate = rate;
     }
 
-    public NetworkArrayContainer calc(NetworkArrayContainer theta, NetworkArrayContainer partialDerivatives){
+    public NetworkArrayContainer calc(NetworkArrayContainer theta, NetworkArrayContainer partialDerivatives, int trainingNumber){
         NetworkArrayContainer result = new NetworkArrayContainer(theta);
         List<Double[][]> thArrays = theta.getArrays();
 
@@ -18,7 +18,7 @@ public class GradientDecentCalc {
             Double[][] lvlTheta = thArrays.get(k);
             for (int i = 0; i < lvlTheta.length; i++) {
                 for (int j = 0; j < lvlTheta[i].length; j++) {
-                    double newVal = lvlTheta[i][j] - (rate * (partialDerivatives.get(k, i, j))/1);
+                    double newVal = lvlTheta[i][j] - (rate * (partialDerivatives.get(k, i, j))/trainingNumber);
                     result.set(k, i, j, newVal);
                 }
             }
