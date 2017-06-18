@@ -21,9 +21,11 @@ public class Util {
             List<Neuron> layer = neuralNetwork.getLayer(lyr);
             List<Neuron> prevLayer = neuralNetwork.getLayer(lyr - 1);
             Double[][] arrayLayer = new Double[layer.size()][prevLayer.size()];
-            Double zero = 0.0;
-            Arrays.fill(arrayLayer[0], zero);
-            Arrays.fill(arrayLayer, arrayLayer[0]);
+            for (int i = 0; i < layer.size(); i++) {
+                for (int j = 0; j < prevLayer.size(); j++) {
+                    arrayLayer[i][j] = 0.0;
+                }
+            }
             result.add(arrayLayer);
         }
         return result;
