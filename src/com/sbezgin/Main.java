@@ -76,18 +76,18 @@ public class Main {
     }
 
     private static Map<Integer, List<Neuron>> buildMap() {
-        Synapse s00L0 = new Synapse();
-        Synapse s01L0 = new Synapse();
-        Synapse s10L0 = new Synapse();
-        Synapse s11L0 = new Synapse();
+        Synapse s00L0 = new Synapse(0.2);
+        Synapse s01L0 = new Synapse(0.3);
+        Synapse s10L0 = new Synapse(0.4);
+        Synapse s11L0 = new Synapse(-0.2);
 
-        Synapse s00L1 = new Synapse();
-        Synapse s01L1 = new Synapse();
-        Synapse s10L1 = new Synapse();
-        Synapse s11L1 = new Synapse();
+        Synapse s00L1 = new Synapse(0.15);
+        Synapse s01L1 = new Synapse(-0.15);
+        Synapse s10L1 = new Synapse(-0.5);
+        Synapse s11L1 = new Synapse(0.6);
 
-        Synapse s00L2 = new Synapse();
-        Synapse s01L2 = new Synapse();
+        Synapse s00L2 = new Synapse(-0.7);
+        Synapse s01L2 = new Synapse(-0.65);
 
         Neuron neuron00 = new Neuron(0);
 

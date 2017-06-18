@@ -8,9 +8,9 @@ public class Synapse {
     private Neuron from;
     private Neuron to;
 
-    public Synapse() {
-        Random random = new Random();
-        weight = (random.nextDouble() * 2 * epsilon) - epsilon;
+    public Synapse(double w) {
+        //Random random = new Random();
+        weight = w;//(random.nextDouble() * 2 * epsilon) - epsilon;
     }
 
     public double getWeight() {

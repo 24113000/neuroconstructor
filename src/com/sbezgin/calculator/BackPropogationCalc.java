@@ -70,6 +70,7 @@ public class BackPropogationCalc {
                 }
             }
         }
+        System.out.println("Stop");
     }
 
     public double updateSynapses(int trainingNumber) {
