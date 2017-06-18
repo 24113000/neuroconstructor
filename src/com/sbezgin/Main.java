@@ -25,17 +25,18 @@ public class Main {
         trainingExample.put(Arrays.asList(1.0, 0.0),0);
         trainingExample.put(Arrays.asList(0.0, 0.0),0);
 
-        GradientDecentCalc decentCalc = new GradientDecentCalc(0.7);
+        GradientDecentCalc decentCalc = new GradientDecentCalc(0.3);
         NeuronResultHolder resultHolder = new NeuronResultHolder(neuralNetwork);
 
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 9000; i++) {
             BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, decentCalc, resultHolder);
 
             for (Map.Entry<List<Double>, Integer> entry : trainingExample.entrySet()) {
+
                 List<Double> inputParams = entry.getKey();
                 Integer expectedResult = entry.getValue();
-                ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, inputParams, resultHolder);
 
+                ForwardCalc forwardCalc = new ForwardCalc(neuralNetwork, inputParams, resultHolder);
                 forwardCalc.evaluate();
 
                 backPropogationCalc.collectDeltaError(new double[]{expectedResult}, inputParams.toArray(new Double[inputParams.size()]));

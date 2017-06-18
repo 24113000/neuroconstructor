@@ -23,12 +23,10 @@ public class NeuronImpl implements Neuron {
     }
 
     public void addInSynapse(Synapse s) {
-        s.setTo(this);
         inSynapses.add(s);
     }
 
     public void addOutSynapse(Synapse s) {
-        s.setFrom(this);
         outSynapses.add(s);
     }
 

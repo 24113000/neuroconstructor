@@ -41,8 +41,8 @@ public class ForwardCalc {
                     Synapse synapse = inSynapses.get(i);
                     sum += synapse.getWeight() * values.get(i);
                 }
-                double neuronOut = sigmoid(sum);
-                resultHolder.set(currentLayer, neuron.getPosition(), neuronOut);
+                double neuronResult = sigmoid(sum);
+                resultHolder.set(currentLayer, neuron.getPosition(), neuronResult);
             }
         }
     }

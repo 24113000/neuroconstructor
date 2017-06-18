@@ -46,11 +46,11 @@ public class BackPropogationCalc {
                 for (int i=0; i < layer.size(); i++) {
                     Neuron neuron = layer.get(i);
                     List<Synapse> outSynapses = neuron.getOutSynapses();
+                    Double[] nextLayerDeltas = deltasMap.get(nextLevel);
                     for (int j = 0; j < outSynapses.size(); j++) {
                         Synapse synapse = outSynapses.get(j);
-                        double weight = synapse.getWeight();
 
-                        Double[] nextLayerDeltas = deltasMap.get(nextLevel);
+                        double weight = synapse.getWeight();
                         deltas[i] += weight * nextLayerDeltas[j];
                     }
 

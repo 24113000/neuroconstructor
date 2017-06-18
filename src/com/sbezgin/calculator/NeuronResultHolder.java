@@ -13,7 +13,7 @@ public class NeuronResultHolder {
     public NeuronResultHolder(NeuralNetwork neuralNetwork) {
         map = new HashMap<>();
         int layersNumber = neuralNetwork.getLayersNumber();
-        for (int i = 0; i < layersNumber; i++) {
+        for (int i = 1; i < layersNumber; i++) {
             List<Neuron> layer = neuralNetwork.getLayer(i);
             List<Double> doubles = new ArrayList<>(layer.size());
             map.put(i, doubles);
