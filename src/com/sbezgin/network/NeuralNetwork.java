@@ -12,7 +12,7 @@ public class NeuralNetwork {
     private Map<Integer, List<Neuron>> nnMap;
     private List<Integer> levelIds;
 
-    protected NeuralNetwork(Map<Integer, List<Neuron>> nnMap) {
+    public NeuralNetwork(Map<Integer, List<Neuron>> nnMap) {
         this.nnMap = nnMap;
         this.layersNumber = nnMap.size();
 

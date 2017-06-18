@@ -6,18 +6,21 @@ import com.sbezgin.calculator.GradientDecentCalc;
 import com.sbezgin.calculator.NeuronResultHolder;
 import com.sbezgin.network.NNBuilderImpl;
 import com.sbezgin.network.NeuralNetwork;
+import com.sbezgin.network.Synapse;
+import com.sbezgin.network.neuron.Neuron;
+import com.sbezgin.network.neuron.NeuronImpl;
 
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        NeuralNetwork neuralNetwork =  new NNBuilderImpl()
+        NeuralNetwork neuralNetwork = new NeuralNetwork(buildMap()); /*new NNBuilderImpl()
                 .addInputLayer(2)
                 .addLayer(2)
                 .addLayer(2)
                 .addOutputLayer(1)
-                .build();
+                .build();*/
 
         Map<List<Double>, Integer> trainingExample = new HashMap<>();
         trainingExample.put(Arrays.asList(1.0, 1.0),1);
@@ -70,4 +73,86 @@ public class Main {
         result = resultHolder.getResults(finalLayer);
         System.out.println("Final 1 0 result : " + Arrays.toString(result));
     }
+
+    private static Map<Integer, List<Neuron>> buildMap() {
+        Synapse s00L0 = new Synapse(0.2);
+        Synapse s01L0 = new Synapse(0.3);
+        Synapse s10L0 = new Synapse(0.4);
+        Synapse s11L0 = new Synapse(-0.2);
+
+        Synapse s00L1 = new Synapse(0.15);
+        Synapse s01L1 = new Synapse(-0.15);
+        Synapse s10L1 = new Synapse(-0.5);
+        Synapse s11L1 = new Synapse(0.6);
+
+        Synapse s00L2 = new Synapse(-0.7);
+        Synapse s01L2 = new Synapse(-0.65);
+
+        Neuron neuronIn0 = new NeuronImpl(0, 0, false, true);
+        s00L0.setFrom(neuronIn0);
+        neuronIn0.addOutSynapse(s00L0);
+        s10L0.setFrom(neuronIn0);
+        neuronIn0.addOutSynapse(s10L0);
+
+        Neuron neuronIn1 = new NeuronImpl(0, 1, false, true);
+        s01L0.setFrom(neuronIn1);
+        neuronIn1.addOutSynapse(s01L0);
+        s11L0.setFrom(neuronIn1);
+        neuronIn1.addOutSynapse(s11L0);
+
+        Neuron neuron00 = new NeuronImpl(1, 0, false, false);
+        s00L0.setTo(neuron00);
+        neuron00.addInSynapse(s00L0);
+        s01L0.setTo(neuron00);
+        neuron00.addInSynapse(s01L0);
+
+        s00L1.setFrom(neuron00);
+        neuron00.addOutSynapse(s00L1);
+        s10L1.setFrom(neuron00);
+        neuron00.addOutSynapse(s10L1);
+
+        Neuron neuron01 = new NeuronImpl(1, 1, false, false);
+
+        s10L0.setTo(neuron01);
+        neuron01.addInSynapse(s10L0);
+        s11L0.setTo(neuron01);
+        neuron01.addInSynapse(s11L0);
+
+        s01L1.setFrom(neuron01);
+        neuron01.addOutSynapse(s01L1);
+        s11L1.setFrom(neuron01);
+        neuron01.addOutSynapse(s11L1);
+
+        Neuron neuron10 = new NeuronImpl(2, 0, false, false);
+
+        s00L1.setTo(neuron10);
+        neuron10.addInSynapse(s00L1);
+        s01L1.setTo(neuron10);
+        neuron10.addInSynapse(s01L1);
+
+        s00L2.setFrom(neuron10);
+        neuron10.addOutSynapse(s00L2);
+
+        Neuron neuron11 = new NeuronImpl(2, 1, false, false);
+
+        s10L1.setTo(neuron11);
+        neuron11.addInSynapse(s10L1);
+        s11L1.setTo(neuron11);
+        neuron11.addInSynapse(s11L1);
+
+        s01L2.setFrom(neuron11);
+        neuron11.addOutSynapse(s01L2);
+
+        Neuron neuron20 = new NeuronImpl(3, 0, true, false);
+        neuron20.addInSynapse(s00L2);
+        neuron20.addInSynapse(s01L2);
+
+        Map<Integer, List<Neuron>> map = new HashMap<>();
+        map.put(0, Arrays.asList(neuron00, neuron01));
+        map.put(1, Arrays.asList(neuron00, neuron01));
+        map.put(2, Arrays.asList(neuron10, neuron11));
+        map.put(3, Arrays.asList(neuron20));
+        return map;
+    }
+
 }
