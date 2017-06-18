@@ -51,7 +51,7 @@ public class NNBuilderImpl implements NNBuilder {
 
         for (Neuron currLayerNeuron : newLayerRegularNeurons) {
             for (Neuron prevLayerNeuron : prevLayer) {
-                Synapse synapse = null; //new Synapse();
+                Synapse synapse = new Synapse();
 
                 synapse.setTo(currLayerNeuron);
                 synapse.setFrom(prevLayerNeuron);

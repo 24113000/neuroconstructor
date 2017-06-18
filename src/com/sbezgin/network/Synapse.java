@@ -8,8 +8,8 @@ public class Synapse {
     private Neuron from;
     private Neuron to;
 
-    public Synapse(double w) {
-        weight = w; // Util.getRandWeights();
+    public Synapse() {
+        weight = Util.getRandWeights();
     }
 
     public double getWeight() {
