@@ -1,16 +1,15 @@
 package com.sbezgin.network;
 
-import java.util.Random;
+
+import com.sbezgin.network.neuron.Neuron;
 
 public class Synapse {
-    private int epsilon = 1;
     private double weight;
     private Neuron from;
     private Neuron to;
 
     public Synapse() {
-        Random random = new Random();
-        weight = (random.nextDouble() * 2 * epsilon) - epsilon;
+        weight = Util.getRandWeights();
     }
 
     public double getWeight() {

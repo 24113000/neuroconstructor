@@ -1,71 +1,78 @@
 package com.sbezgin.calculator;
 
 import com.sbezgin.network.NeuralNetwork;
-import com.sbezgin.network.Neuron;
+import com.sbezgin.network.Util;
+import com.sbezgin.network.neuron.Neuron;
 import com.sbezgin.network.Synapse;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class BackPropogationCalc {
     private final GradientDecentCalc decentCalc;
     private final NeuralNetwork neuralNetwork;
-    private NetworkArrayContainer partialDerivatives;
+    private final NeuronResultHolder resultHolder;
+    private List<Double[][]> partialDerivatives;
     private double costResult = 0.0;
 
-    public BackPropogationCalc(NeuralNetwork neuralNetwork, GradientDecentCalc decentCalc) {
+    public BackPropogationCalc(NeuralNetwork neuralNetwork, GradientDecentCalc decentCalc, NeuronResultHolder resultHolder) {
         this.neuralNetwork = neuralNetwork;
         this.decentCalc = decentCalc;
-        partialDerivatives  = new NetworkArrayContainer(neuralNetwork);
+        this.partialDerivatives = Util.createNNArray(neuralNetwork);
+        this.resultHolder = resultHolder;
     }
 
     public void collectDeltaError(double[] expectedResult, Double[] inputValues) {
-        int lastLevelId = neuralNetwork.getLevelNumber() - 1;
-        double[][] deltas = new double[neuralNetwork.getLevelNumber()][];
+        int lastLayerId = neuralNetwork.getLayersNumber() - 1;
+        Map<Integer, Double[]> deltasMap = new HashMap<>();
 
-        for (int levelNum = lastLevelId; levelNum >= 0; levelNum--) {
-            List<Neuron> level = neuralNetwork.getLevel(levelNum);
+        for (int layerNum = lastLayerId; layerNum > 0; layerNum--) {
+            List<Neuron> layer = neuralNetwork.getLayer(layerNum);
 
-            deltas[levelNum] = new double[level.size()];
+            Double[] deltas = new Double[layer.size()];
+            Arrays.fill(deltas, new Double(0.0));
+            deltasMap.put(layerNum, deltas);
 
-            if (levelNum == lastLevelId) {
-                for (int i = 0; i < level.size(); i++) {
-                    Neuron neuron = level.get(i);
-                    double currentResult = neuron.getCurrentResult();
-                    deltas[levelNum][i] = currentResult - expectedResult[i];
-                    System.out.println("BACK " + Arrays.toString(inputValues) + " Expected result: " + Arrays.toString(expectedResult) + " DIFF: " + deltas[levelNum][i]);
-                    costResult += (deltas[levelNum][i] * deltas[levelNum][i]);
+            if (layerNum == lastLayerId) {
+                for (int i = 0; i < layer.size(); i++) {
+                    Neuron neuron = layer.get(i);
+                    double currentResult = resultHolder.get(layerNum, neuron.getPosition());
+                    double delta = currentResult - expectedResult[i];
+                    deltas[i] = delta;
+                    System.out.println("BACK " + Arrays.toString(inputValues) + " Expected result: " + Arrays.toString(expectedResult) + " DIFF: " + Arrays.toString(deltas));
+                    costResult += (delta * delta);
                 }
             } else {
-                int nextLevel = levelNum + 1;
-                for (int i=0; i < level.size(); i++) {
-                    Neuron neuron = level.get(i);
+                int nextLevel = layerNum + 1;
+                for (int i=0; i < layer.size(); i++) {
+                    Neuron neuron = layer.get(i);
                     List<Synapse> outSynapses = neuron.getOutSynapses();
                     for (int j = 0; j < outSynapses.size(); j++) {
                         Synapse synapse = outSynapses.get(j);
                         double weight = synapse.getWeight();
 
-                        double[] prevDelta = deltas[nextLevel];
-
-                        deltas[levelNum][i] += weight * prevDelta[j];
+                        Double[] nextLayerDeltas = deltasMap.get(nextLevel);
+                        deltas[i] += weight * nextLayerDeltas[j];
                     }
 
-                    deltas[levelNum][i] *= sigmoidDerivatives(neuron.getCurrentResult());
+                    double nResult = resultHolder.get(layerNum, neuron.getPosition());
+                    deltas[i] *= sigmoidDerivatives(nResult);
                 }
             }
 
-            double[] currDelta = deltas[levelNum];
-            for (int i = 0; i < level.size(); i++) {
-                Neuron neuron = level.get(i);
+            Double[] currDelta = deltasMap.get(layerNum);
+            Double[][] derivativesArr = partialDerivatives.get(layerNum - 1);
+            for (int i = 0; i < layer.size(); i++) {
+                Neuron neuron = layer.get(i);
                 List<Synapse> inSynapses = neuron.getInSynapses();
                 double delta = currDelta[i];
                 for (int j = 0; j < inSynapses.size(); j++) {
                     Synapse synapse = inSynapses.get(j);
-                    Neuron from = synapse.getFrom();
-                    if (from != null) {
-                        partialDerivatives.add(levelNum, i, j, from.getCurrentResult() * delta);
+                    Neuron fromNeuron = synapse.getFrom();
+                    if (fromNeuron.isInput()) {
+                        derivativesArr[i][j] += inputValues[j] * delta;
                     } else {
-                        partialDerivatives.add(levelNum, i, j, inputValues[j] * delta);
+                        double neuronResult = resultHolder.get(fromNeuron.getLayerNumber(), fromNeuron.getPosition());
+                        derivativesArr[i][j] += neuronResult * delta;
                     }
                 }
             }
@@ -75,41 +82,22 @@ public class BackPropogationCalc {
     public double updateSynapses(int trainingNumber) {
         double result = costResult;
         costResult = 0.0;
-        NetworkArrayContainer theta = getCurrentTheta();
-        NetworkArrayContainer newThetas = decentCalc.calc(theta, partialDerivatives, trainingNumber);
-        List<Double[][]> arrays = newThetas.getArrays();
-        for (int k = 0; k < arrays.size(); k++) {
-            Double[][] lvlTheta = arrays.get(k);
-            List<Neuron> level = neuralNetwork.getLevel(k);
-            for (int i = 0; i < lvlTheta.length; i++) {
-                for (int j = 0; j < lvlTheta[i].length; j++) {
-                    Neuron neuron = level.get(i);
-                    List<Synapse> inSynapses = neuron.getInSynapses();
-                    Synapse currentSynapse = inSynapses.get(j);
-                    currentSynapse.setWeight(newThetas.get(k, i, j));
+        List<Double[][]> theta = neuralNetwork.getWeights();
+        List<Double[][]> newThetas = decentCalc.calc(theta, partialDerivatives, trainingNumber);
+        for (int layer = 0; layer < theta.size(); layer++) {
+            List<Neuron> neuronLayer = neuralNetwork.getLayer(layer + 1);
+            Double[][] newLayerArr = newThetas.get(layer);
+            for (int i = 0; i < neuronLayer.size(); i++) {
+                Neuron neuron = neuronLayer.get(i);
+                List<Synapse> inSynapses = neuron.getInSynapses();
+                for (int j = 0; j < inSynapses.size(); j++) {
+                    Synapse synapse = inSynapses.get(j);
+                    synapse.setWeight(newLayerArr[i][j]);
                 }
             }
         }
 
         return result/(2*trainingNumber);
-    }
-
-    private NetworkArrayContainer getCurrentTheta() {
-        NetworkArrayContainer theta = new NetworkArrayContainer(neuralNetwork);
-
-        int lastLevelId = neuralNetwork.getLevelNumber() - 1;
-        for (int levelNum = lastLevelId; levelNum >= 0; levelNum--) {
-            List<Neuron> level = neuralNetwork.getLevel(levelNum);
-            for (int i = 0; i < level.size(); i++) {
-                Neuron neuron = level.get(i);
-                List<Synapse> inSynapses = neuron.getInSynapses();
-                for (int j = 0; j < inSynapses.size(); j++) {
-                    Synapse synapse = inSynapses.get(j);
-                    theta.set(levelNum, i, j, synapse.getWeight());
-                }
-            }
-        }
-        return theta;
     }
 
     private double sigmoidDerivatives(double val) {
