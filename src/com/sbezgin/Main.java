@@ -24,14 +24,14 @@ public class Main {
 
         Map<List<Double>, Integer> trainingExample = new HashMap<>();
         trainingExample.put(Arrays.asList(1.0, 1.0),1);
-        trainingExample.put(Arrays.asList(0.0, 1.0),0);
+        trainingExample.put(Arrays.asList(0.0, 1.0),1);
         trainingExample.put(Arrays.asList(1.0, 0.0),0);
         trainingExample.put(Arrays.asList(0.0, 0.0),0);
 
         GradientDecentCalc decentCalc = new GradientDecentCalc(0.3);
         NeuronResultHolder resultHolder = new NeuronResultHolder(neuralNetwork);
 
-        for (int i = 0; i < 9000; i++) {
+        for (int i = 0; i < 150000; i++) {
             BackPropogationCalc backPropogationCalc = new BackPropogationCalc(neuralNetwork, decentCalc, resultHolder);
 
             for (Map.Entry<List<Double>, Integer> entry : trainingExample.entrySet()) {
@@ -75,18 +75,18 @@ public class Main {
     }
 
     private static Map<Integer, List<Neuron>> buildMap() {
-        Synapse s00L0 = new Synapse(0.2);
-        Synapse s01L0 = new Synapse(0.3);
-        Synapse s10L0 = new Synapse(0.4);
-        Synapse s11L0 = new Synapse(-0.2);
+        Synapse s00L0 = new Synapse(0.02);
+        Synapse s01L0 = new Synapse(0.03);
+        Synapse s10L0 = new Synapse(0.04);
+        Synapse s11L0 = new Synapse(-0.02);
 
-        Synapse s00L1 = new Synapse(0.15);
-        Synapse s01L1 = new Synapse(-0.15);
-        Synapse s10L1 = new Synapse(-0.5);
-        Synapse s11L1 = new Synapse(0.6);
+        Synapse s00L1 = new Synapse(0.015);
+        Synapse s01L1 = new Synapse(-0.015);
+        Synapse s10L1 = new Synapse(-0.05);
+        Synapse s11L1 = new Synapse(0.06);
 
-        Synapse s00L2 = new Synapse(-0.7);
-        Synapse s01L2 = new Synapse(-0.65);
+        Synapse s00L2 = new Synapse(-0.07);
+        Synapse s01L2 = new Synapse(-0.065);
 
         Neuron neuronIn0 = new NeuronImpl(0, 0, false, true);
         s00L0.setFrom(neuronIn0);
